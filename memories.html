@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Universe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* --- 1. THE WORLD (Background & Carousel) --- */
+        #world-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            transition: filter 1.5s ease, transform 1.5s ease;
+            transform-style: preserve-3d;
+        }
+
+        .bg-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -3;
+            background: url('https://images.unsplash.com/photo-1519681393798-3828fb4090c7?q=80&w=1920&auto=format&fit=crop') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.4);
+        }
+
+        /* 3D Carousel CSS */
+        #drag-container {
+            position: relative; display: flex; margin: auto;
+            transform-style: preserve-3d; transform: rotateX(-10deg);
+        }
+        #spin-container {
+            position: relative; display: flex; transform-style: preserve-3d;
+            animation: autoRotate 60s infinite linear;
+        }
+        #spin-container img {
+            position: absolute; left: 0; top: 0;
+            width: 200px; height: 280px;
+            object-fit: cover; border-radius: 12px;
+            box-shadow: 0 0 20px #ff4d6d;
+            border: 3px solid rgba(255,255,255,0.8);
+            -webkit-box-reflect: below 10px linear-gradient(transparent, transparent, #0005);
+            transition: transform 0.3s;
+        }
+        #ground {
+            width: 900px; height: 900px; position: absolute; top: 100%; left: 50%;
+            transform: translate(-50%, -50%) rotateX(90deg);
+            background: radial-gradient(center center, farthest-side, #ff4d6d22, transparent);
+        }
+
+        /* --- 2. THE CINEMATIC VIDEO OVERLAY --- */
+        #cinematic-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 1s ease;
+            background: black; /* Base black to fade smoothly */
+        }
+
+        /* THE VIDEO ELEMENT */
+        #meteor-video {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            
+            /* This ensures it covers the whole screen */
+            object-fit: cover; 
+            
+            /* CRITICAL: Focuses on the center. 
+               Since your video is tall, this ensures the Middle part 
+               (where the meteor should be) is shown on PC */
+            object-position: center center;
+            
+            opacity: 0.9;
+            z-index: -1;
+        }
+
+        /* PC SPECIFIC FIXES */
+        @media (min-width: 1024px) {
+            #meteor-video {
+                /* Because 720p stretched to a PC monitor might look pixelated,
+                   we add a slight blur. It creates a "Dreamy Nebula" effect 
+                   instead of a "Low Quality Video" look. */
+                filter: blur(4px) brightness(1.1) contrast(1.2);
+                transform: scale(1.1); /* Slight zoom to hide edges */
+            }
+        }
+        /* CENTERED ROMANTIC TEXT */
+        .cinematic-text {
+            font-family: 'Great Vibes', cursive;
+            color: #fff;
+            font-size: 3.5rem;
+            text-align: center;
+            /* White text with Purple/Pink Glow to match the video */
+            text-shadow: 0 0 10px #fff, 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 1.5s ease;
+            z-index: 1002;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            position: relative; /* Ensure it sits on top of video */
+        }
+
+        /* ANIMATION CLASSES */
+        .blur-mode {
+            filter: blur(15px) brightness(0.4); /* Deep blur to focus on video */
+            transform: scale(0.95);
+        }
+
+        /* NEXT BUTTON */
+        .btn-next {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            padding: 15px 40px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);
+            color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 30px; font-weight: bold; box-shadow: 0 0 20px rgba(255, 77, 109, 0.3);
+            transition: 0.3s; z-index: 2000;
+        }
+        .btn-next:hover { background: #ff4d6d; color: white; }
+
+        @keyframes autoRotate { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+
+        /* Responsive Fixes */
+        @media (max-width: 768px) {
+            .cinematic-text { font-size: 2.5rem; }
+            #spin-container img { width: 140px; height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="world-container">
+        <div class="bg-layer"></div>
+        <div id="drag-container">
+            <div id="spin-container">
+                <img src="/Images/1.jpeg" alt="">
+                <img src="/Images/2.jpeg" alt="">
+                <img src="/Images/3.jpeg" alt="">
+                <img src="/Images/4.jpeg" alt="">
+                <img src="/Images/5.jpeg" alt="">
+                <img src="/Images/6.jpeg" alt="">
+                <img src="/Images/7.jpeg" alt="">
+                <img src="/Images/8.jpeg" alt="">
+                <img src="/Images/9.jpeg" alt="">
+                <img src="/Images/10.jpeg" alt="">
+                
+                <p style="position: absolute; top: 100%; left: 50%; transform: translate(-50%,-50%) rotateX(90deg); color: #fff; opacity: 0.5;">
+                    Drag to explore...
+                </p>
+            </div>
+            <div id="ground"></div>
+        </div>
+    </div>
+
+    <div id="cinematic-overlay">
+        <video id="meteor-video" muted playsinline>
+            <source src="/meteor.mp4" type="video/mp4">
+        </video>
+        
+        <div class="cinematic-text" id="love-text"></div>
+    </div>
+
+    <a href="proposal.html" class="btn-next">The Final Surprise →</a>
+
+    <script>
+        // --- CONFIGURATION ---
+        const romanticLines = [
+            "Wish for something, my love... ✨", 
+            "I've fallen for your eyes...",
+            "Your hair is like silk...",
+            "I sometimes smell your fragrance...",
+            "You are my destiny...",
+            "Every star in the sky shines for you."
+        ];
+        
+        const world = document.getElementById('world-container');
+        const overlay = document.getElementById('cinematic-overlay');
+        const video = document.getElementById('meteor-video');
+        const textElement = document.getElementById('love-text');
+        
+        let lineIndex = 0;
+        let isPlaying = false;
+
+        // --- CINEMATIC LOGIC ---
+        function triggerCinematicMoment() {
+            if(isPlaying) return;
+            isPlaying = true;
+
+            // 1. Blur World
+            world.classList.add('blur-mode');
+            
+            // 2. Fade In Overlay
+            overlay.style.opacity = '1';
+            
+            // 3. Play Video (Reset to start)
+            video.currentTime = 0;
+            video.play();
+            
+            // 4. Set Text
+            textElement.innerHTML = romanticLines[lineIndex];
+            lineIndex++;
+            if (lineIndex >= romanticLines.length) lineIndex = 1; // Loop back
+            
+            // 5. Animate Text (Delay for impact)
+            setTimeout(() => {
+                textElement.style.opacity = '1';
+                textElement.style.transform = 'scale(1)';
+            }, 800);
+
+            // 6. HOLD FOR 6 SECONDS (The Wish Moment)
+            setTimeout(() => {
+                // Fade out text
+                textElement.style.opacity = '0';
+                textElement.style.transform = 'scale(0.9)';
+                
+                // Fade out Overlay
+                overlay.style.opacity = '0';
+                
+                // Unblur World
+                world.classList.remove('blur-mode');
+                
+                // Stop Video Logic
+                setTimeout(() => {
+                    video.pause();
+                    isPlaying = false;
+                }, 1000); // Wait for fade out to finish before pausing
+
+            }, 6000); // <--- 6 SECOND PAUSE
+        }
+
+        // --- TIMING LOOPS ---
+        // First trigger after 2 seconds
+        setTimeout(triggerCinematicMoment, 2000);
+
+        // Repeat every 14 seconds (6s active + 8s waiting)
+        setInterval(triggerCinematicMoment, 14000);
+
+
+        // --- 3D CAROUSEL LOGIC ---
+        const radius = 290; 
+        const autoRotate = true; 
+        const rotateSpeed = -60; 
+        const imgWidth = 120; 
+        const imgHeight = 170;
+
+        setTimeout(init, 1000);
+
+        const odrag = document.getElementById('drag-container');
+        const ospin = document.getElementById('spin-container');
+        const aImg = ospin.getElementsByTagName('img');
+        
+        function init(delayTime) {
+            for (let i = 0; i < aImg.length; i++) {
+                aImg[i].style.transform = "rotateY(" + (i * (360 / aImg.length)) + "deg) translateZ(" + radius + "px)";
+                aImg[i].style.transition = "transform 1s";
+                aImg[i].style.transitionDelay = delayTime || (aImg.length - i) / 4 + "s";
+            }
+        }
+
+        document.onmousedown = function (e) {
+            clearInterval(odrag.timer);
+            var sX = e.clientX, sY = e.clientY;
+            document.onmousemove = function (e) {
+                var nX = e.clientX, nY = e.clientY;
+                var desX = nX - sX; var desY = nY - sY;
+                tX += desX * 0.1; tY += desY * 0.1;
+                applyTranform(odrag); sX = nX; sY = nY;
+            };
+            document.onmouseup = function () {
+                odrag.timer = setInterval(function () {
+                    desX *= 0.95; desY *= 0.95; tX += desX * 0.1; tY += desY * 0.1;
+                    applyTranform(odrag); playSpin(false);
+                    if (Math.abs(desX) < 0.5 && Math.abs(desY) < 0.5) { clearInterval(odrag.timer); playSpin(true); }
+                }, 17);
+                document.onmousemove = null; document.onmouseup = null;
+            };
+            return false;
+        };
+        
+        document.ontouchstart = function (e) {
+            clearInterval(odrag.timer); e.preventDefault();
+            var sX = e.touches[0].clientX, sY = e.touches[0].clientY;
+            document.ontouchmove = function (e) {
+                var nX = e.touches[0].clientX, nY = e.touches[0].clientY;
+                var desX = nX - sX; var desY = nY - sY;
+                tX += desX * 0.1; tY += desY * 0.1;
+                applyTranform(odrag); sX = nX; sY = nY;
+            };
+            document.ontouchend = function () {
+                odrag.timer = setInterval(function () {
+                    desX *= 0.95; desY *= 0.95; tX += desX * 0.1; tY += desY * 0.1;
+                    applyTranform(odrag); playSpin(false);
+                    if (Math.abs(desX) < 0.5 && Math.abs(desY) < 0.5) { clearInterval(odrag.timer); playSpin(true); }
+                }, 17);
+                document.ontouchmove = null; document.ontouchend = null;
+            };
+            return false;
+        };
+
+        var tX = 0, tY = 10;
+        function applyTranform(obj) {
+            if(tY > 180) tY = 180; if(tY < 0) tY = 0;
+            obj.style.transform = "rotateX(" + (-tY) + "deg) rotateY(" + (tX) + "deg)";
+        }
+        function playSpin(yes) { ospin.style.animationPlayState = (yes?'running':'paused'); }
+    </script>
+</body>
+</html>

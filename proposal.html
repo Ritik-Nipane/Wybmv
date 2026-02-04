@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- MAIN RESET --- */
+        body {
+            margin: 0; height: 100vh;
+            /* Deep romantic background matching previous pages */
+            background: radial-gradient(circle at center, #2b1019 0%, #000 100%);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden; color: white;
+            perspective: 1000px; /* Essential for 3D */
+        }
+
+        /* --- 1. NEW INTRO ANIMATION ELEMENTS --- */
+        #intro-container {
+            position: absolute;
+            display: flex; flex-direction: column; align-items: center;
+            z-index: 50;
+            transition: opacity 1s ease;
+        }
+
+        .pulsing-star {
+            width: 20px; height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #fff, 0 0 40px #ff4d6d, 0 0 80px #ffd700;
+            animation: pulseStar 2s ease-in-out infinite;
+        }
+
+        .intro-text {
+            margin-top: 30px;
+            font-family: 'Great Vibes', cursive;
+            font-size: 2rem; color: #ffd700;
+            opacity: 0; animation: fadeText 3s ease-in-out forwards;
+        }
+
+        @keyframes pulseStar {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 1; box-shadow: 0 0 30px #fff, 0 0 60px #ff4d6d, 0 0 100px #ffd700; }
+        }
+        @keyframes fadeText { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 1; } }
+
+
+        /* --- 2. 3D GIFT BOX (Hidden initially) --- */
+        .gift-container { 
+            perspective: 1000px; cursor: pointer; 
+            opacity: 0; transform: translateY(-500px); /* Starts in sky */
+            transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Smooth drop effect */
+            z-index: 100;
+        }
+        
+        .gift {
+            position: relative; width: 150px; height: 150px;
+            transform-style: preserve-3d; transition: transform 1s;
+            animation: float 3s ease-in-out infinite;
+        }
+        /* The open state */
+        .gift.open { transform: rotateX(20deg) rotateY(20deg) scale(0.8); animation: none; }
+        
+        /* Box Faces construction */
+        .face { position: absolute; width: 150px; height: 150px; background: #c9184a; border: 2px solid #590d22; }
+        .face.top { transform: rotateX(90deg) translateZ(75px); background: #ff4d6d; transition: 0.5s; transform-origin: top; }
+        .face.front { transform: translateZ(75px); }
+        .face.back { transform: rotateY(180deg) translateZ(75px); }
+        .face.left { transform: rotateY(-90deg) translateZ(75px); }
+        .face.right { transform: rotateY(90deg) translateZ(75px); }
+        .face.bottom { transform: rotateX(-90deg) translateZ(75px); }
+
+        /* Ribbons */
+        .ribbon { position: absolute; background: #ffd700; }
+        .ribbon.v { width: 30px; height: 100%; left: 60px; }
+        .ribbon.h { width: 100%; height: 30px; top: 60px; }
+
+        /* --- 3. THE FINAL QUESTION UI --- */
+        .content {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0); /* Starts tiny */
+            text-align: center; transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Pop up effect */
+            z-index: 200; pointer-events: none; width: 90%;
+        }
+        .show-content { transform: translate(-50%, -50%) scale(1); pointer-events: all; }
+
+        h1 { 
+            font-family: 'Great Vibes'; font-size: 4rem; 
+            color: #ff4d6d; text-shadow: 0 0 30px rgba(255, 77, 109, 0.5); 
+            margin-bottom: 40px; white-space: nowrap;
+        }
+
+        .btn-group { display: flex; gap: 40px; justify-content: center; position: relative; height: 60px; }
+        
+        button {
+            padding: 15px 50px; font-size: 1.5rem; border-radius: 50px; border: none; 
+            font-family: 'Montserrat', sans-serif; font-weight: 600; cursor: pointer;
+        }
+        
+        /* YES Button Styles */
+        .yes { 
+            background: linear-gradient(45deg, #ff4d6d, #c9184a); color: white; 
+            box-shadow: 0 0 30px rgba(255, 77, 109, 0.6); transition: 0.3s; z-index: 10; 
+        }
+        .yes:hover { transform: scale(1.1); box-shadow: 0 0 50px #ff4d6d; }
+        
+        /* NO Button Styles (Initial) */
+        .no { 
+            background: rgba(255,255,255,0.1); color: #fff; border: 2px solid #fff;
+            position: absolute; /* Crucial for movement */
+            transition: all 0.2s ease; /* Smooth getaway */
+        }
+
+        /* Helper Text */
+        .hint { margin-top: 60px; opacity: 0; animation: blink 2s infinite; color: #ffd700; font-size: 1.2rem; letter-spacing: 2px; transition: opacity 1s; }
+
+        /* Animations */
+        @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:1} }
+        @keyframes float { 0%,100%{transform: translateY(0) rotateY(45deg) rotateX(10deg);} 50%{transform: translateY(-25px) rotateY(45deg) rotateX(10deg);} }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.8rem; white-space: normal; }
+            button { padding: 12px 30px; font-size: 1.2rem; }
+            .btn-group { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="intro-container">
+        <div class="pulsing-star"></div>
+        <div class="intro-text">Almost there...</div>
+    </div>
+
+    <div class="gift-container" id="gift-box">
+        <div class="gift">
+            <div class="face front"><div class="ribbon v"></div><div class="ribbon h"></div></div>
+            <div class="face back"><div class="ribbon v"></div><div class="ribbon h"></div></div>
+            <div class="face left"><div class="ribbon h"></div></div>
+            <div class="face right"><div class="ribbon h"></div></div>
+            <div class="face top"><div class="ribbon v"></div></div> <div class="face bottom"></div>
+        </div>
+    </div>
+    <div class="hint" id="hint-text">Open it... 🎁</div>
+
+    <div class="content" id="proposal-content">
+        <h1>Will You Be My Valentine?</h1>
+        <div class="btn-group">
+            <button class="yes" id="yes-btn">YES ❤️</button>
+            <button class="no" id="no-btn">No</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. OPENING SEQUENCE ---
+        window.onload = function() {
+            // Hold the star intro for 3 seconds
+            setTimeout(() => {
+                // Fade out intro
+                document.getElementById('intro-container').style.opacity = '0';
+                
+                // Drop Gift Box down
+                setTimeout(() => {
+                    const box = document.getElementById('gift-box');
+                    box.style.opacity = '1';
+                    box.style.transform = 'translateY(0)'; // Center Screen
+                    
+                    // Show Hint Text
+                    setTimeout(() => {
+                        document.getElementById('hint-text').style.opacity = '1';
+                    }, 1000);
+                }, 800); // Wait for intro to fade before dropping
+                
+            }, 3000);
+        };
+
+        // --- 2. GIFT BOX INTERACTION ---
+        const giftBox = document.getElementById('gift-box');
+        const gift = document.querySelector('.gift');
+        const content = document.getElementById('proposal-content');
+        const hint = document.getElementById('hint-text');
+        
+        giftBox.addEventListener('click', () => {
+            if(!gift.classList.contains('open')) {
+                gift.classList.add('open'); // Triggers CSS rotation
+                hint.style.display = 'none';
+                
+                setTimeout(() => {
+                    content.classList.add('show-content'); // Pop up question
+                    giftBox.style.display = 'none'; // Hide box
+                }, 500);
+            }
+        });
+
+        // --- 3. THE RUNAWAY "NO" BUTTON ---
+        const noBtn = document.getElementById('no-btn');
+        const yesBtn = document.getElementById('yes-btn');
+
+        // We track mouse over (PC) and touch start (Mobile)
+        ['mouseover', 'touchstart'].forEach(evt => 
+            noBtn.addEventListener(evt, function(e) {
+                // Stop default touch behavior on mobile to prevent clicking
+                if(evt === 'touchstart') e.preventDefault();
+
+                // Calculate available screen space minus button size
+                const maxX = window.innerWidth - this.offsetWidth - 50; // 50px safety margin
+                const maxY = window.innerHeight - this.offsetHeight - 50;
+                
+                // Generate random position
+                const newX = Math.random() * maxX;
+                const newY = Math.random() * maxY;
+                
+                // Apply new position
+                // We switch to fixed position so it breaks out of the flex container
+                this.style.position = 'fixed'; 
+                this.style.left = newX + 'px';
+                this.style.top = newY + 'px';
+            })
+        );
+
+        // --- 4. THE "YES" FINALE ---
+        yesBtn.addEventListener('click', () => {
+            // Hide the buttons
+            document.querySelector('.btn-group').style.display = 'none';
+            
+            // Update the big text
+            const h1 = document.querySelector('h1');
+            h1.innerHTML = "You made me the happiest person alive! 💖";
+            h1.style.fontSize = "3rem"; // Adjust size for longer text
+            h1.style.whiteSpace = "normal";
+
+            // Launch Infinite Confetti
+            const duration = 10 * 1000; // 10 seconds
+            const end = Date.now() + duration;
+            const colors = ['#ff4d6d', '#ffd700', '#ffffff'];
+
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+                
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        });
+    </script>
+</body>
+</html>
